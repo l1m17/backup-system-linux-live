@@ -1023,6 +1023,7 @@ union_append_bundles()
 # Create empty fstab properly
 # $1 = root directory
 # $2 = directory where boot disk is mounted
+# $3 = bootdevice
 #
 fstab_create()
 {
@@ -1041,18 +1042,24 @@ fstab_create()
       return
    fi
 
-   BOOTDEVICE=$(df "$2" | tail -n 1 | cut -d " " -f 1)
+   OPTS="defaults,nofail"
+
+   echo >> $FSTAB
+
+   BOOTDEVICE="$3"
+   mkdir -p "$1$BOOT_PARTITION_MOUNT_POINT"
+   echo "$BOOTDEVICE" "$BOOT_PARTITION_MOUNT_POINT" auto $OPTS 0 0 >> $FSTAB
 
    echo >> $FSTAB
 
    blkid | grep -v "^/dev/loop" | grep -v "^/dev/zram" | cut -d: -f 1 | while read DEVICE; do
       FS="$(device_bestfs $DEVICE)"
-      LABEL="$(basename $DEVICE)"
-      OPTS="defaults,noatime,nofail,x-systemd.device-timeout=10"
+      LABEL="$(device_tag $DEVICE LABEL)"
+      SPACELESS_LABEL=${LABEL// /\\040}
 
-      if [ "$FS" != "" -a "$FS" != "swap" -a "$FS" != "squashfs" -a "$DEVICE" != "$BOOTDEVICE" ]; then
-         mkdir -p "$1/media/$LABEL"
-         echo "$DEVICE" "/media/$LABEL" $FS $OPTS 0 0 >> $FSTAB
+      if [ "$FS" != "" -a "$FS" != "swap" -a "$FS" != "squashfs" -a "$DEVICE" != "$BOOTDEVICE" -a "$LABEL" != "" ]; then
+         mkdir -p "$1/media/root/$LABEL"
+         echo "$DEVICE" "/media/root/$SPACELESS_LABEL" auto $OPTS 0 0 >> $FSTAB
       fi
    done
 }

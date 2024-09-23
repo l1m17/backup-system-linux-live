@@ -45,6 +45,11 @@ BEXT=sb
 # Directory with kernel .ko modules, can be different in some distros
 LMK="lib/modules/$KERNEL"
 
+
+# CUSTOM CONFIG
+
+BOOT_PARTITION_MOUNT_POINT="/bootdevice"
+
 # Choose one of lz4, lzo, gzip, zstd, xz
 # largest to smallest size
 # fastest to slowest

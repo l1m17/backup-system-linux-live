@@ -34,6 +34,7 @@ init_blkid_cache
 
 # find data dir with filesystem bundles
 DATA="$(find_data 45 "$DATAMNT")"
+BOOTDEVICE="$(mounted_device "$DATAMNT")"
 check_data_found "$DATA"
                                                                                                                                                       debug_shell
 # setup persistent changes, if possible
@@ -55,7 +56,7 @@ union_append_bundles "$BUNDLES" "$UNION"
 copy_rootcopy_content "$DATA" "$UNION"
 
 # create fstab
-fstab_create "$UNION" "$DATAMNT"
+fstab_create "$UNION" "$DATAMNT" "$BOOTDEVICE"
                                                                                                                                                       debug_shell
 # run user custom preinit
 user_preinit "$DATA" "$UNION"
